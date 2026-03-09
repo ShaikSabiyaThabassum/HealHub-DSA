@@ -80,6 +80,11 @@ class ActionStack {
 
     void display() {
 
+        if (top == -1) {
+            System.out.println("No History Available");
+            return;
+        }
+
         System.out.println("\n--- Action History ---");
 
         for (int i = top; i >= 0; i--)
@@ -104,7 +109,7 @@ public class HealHubDSA {
     static TokenQueue tokenQueue = new TokenQueue();
     static ActionStack history = new ActionStack();
 
-    /* PATIENT REGISTRATION (Linked List) */
+    /* PATIENT REGISTRATION */
     static void registerPatient() {
 
         System.out.print("Enter Name: ");
@@ -137,6 +142,11 @@ public class HealHubDSA {
     /* DISPLAY PATIENTS */
     static void displayPatients() {
 
+        if (head == null) {
+            System.out.println("No Patients Registered");
+            return;
+        }
+
         Patient temp = head;
 
         while (temp != null) {
@@ -152,7 +162,7 @@ public class HealHubDSA {
         }
     }
 
-    /* SEARCH PATIENT (Linear Search) */
+    /* SEARCH PATIENT */
     static void searchPatient() {
 
         System.out.print("Enter Patient Name: ");
@@ -162,7 +172,7 @@ public class HealHubDSA {
 
         while (temp != null) {
 
-            if (temp.name.equals(name)) {
+            if (temp.name.equalsIgnoreCase(name)) {
 
                 System.out.println("Patient Found");
                 System.out.println("ID: " + temp.id);
@@ -178,6 +188,11 @@ public class HealHubDSA {
 
     /* ADD DOCTOR */
     static void addDoctor() {
+
+        if (doctorCount == 50) {
+            System.out.println("Doctor List Full");
+            return;
+        }
 
         System.out.print("Doctor Name: ");
         String name = sc.next();
@@ -201,7 +216,7 @@ public class HealHubDSA {
 
             for (int j = 0; j < doctorCount - i - 1; j++) {
 
-                if (doctors[j].name.compareTo(doctors[j + 1].name) > 0) {
+                if (doctors[j].name.compareToIgnoreCase(doctors[j + 1].name) > 0) {
 
                     Doctor temp = doctors[j];
                     doctors[j] = doctors[j + 1];
@@ -217,6 +232,11 @@ public class HealHubDSA {
     /* DISPLAY DOCTORS */
     static void displayDoctors() {
 
+        if (doctorCount == 0) {
+            System.out.println("No Doctors Added");
+            return;
+        }
+
         for (int i = 0; i < doctorCount; i++) {
 
             System.out.println(
@@ -227,7 +247,7 @@ public class HealHubDSA {
         }
     }
 
-    /* GENERATE TOKEN (Queue) */
+    /* GENERATE TOKEN */
     static void generateToken() {
 
         int token = tokenNumber++;
@@ -260,8 +280,7 @@ public class HealHubDSA {
             System.out.println("8 Show History");
             System.out.println("9 Exit");
 
-         
-
+            System.out.print("Enter Choice: ");
             choice = sc.nextInt();
 
             switch (choice) {
@@ -297,8 +316,15 @@ public class HealHubDSA {
                 case 8:
                     history.display();
                     break;
+
+                case 9:
+                    System.out.println("Exiting HealHub System...");
+                    break;
+
+                default:
+                    System.out.println("Invalid Choice");
             }
 
-        } while (choice != 0);
+        } while (choice != 9);
     }
 }
