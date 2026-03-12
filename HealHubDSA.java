@@ -17,20 +17,70 @@ class Patient {
     }
 }
 
+/* HASH TABLE USING SEPARATE CHAINING */
+
+class PatientHashTable {
+
+    int size = 10;
+    Patient table[] = new Patient[size];
+
+    int hashFunction(int id) {
+        return id % size;
+    }
+
+    void insert(Patient p) {
+
+        int index = hashFunction(p.id);
+
+        if (table[index] == null) {
+            table[index] = p;
+        } else {
+
+            Patient temp = table[index];
+
+            while (temp.next != null)
+                temp = temp.next;
+
+            temp.next = p;
+        }
+    }
+
+    void displayHash() {
+
+        for (int i = 0; i < size; i++) {
+
+            System.out.print("Index " + i + ": ");
+
+            Patient temp = table[i];
+
+            while (temp != null) {
+                System.out.print(temp.name + " -> ");
+                temp = temp.next;
+            }
+
+            System.out.println("null");
+        }
+    }
+}
+
 /* DOCTOR CLASS */
+
 class Doctor {
     int id;
     String name;
     String specialization;
+    int experience;
 
-    Doctor(int id, String name, String specialization) {
+    Doctor(int id, String name, String specialization, int experience) {
         this.id = id;
         this.name = name;
         this.specialization = specialization;
+        this.experience = experience;
     }
 }
 
 /* QUEUE FOR TOKEN */
+
 class TokenQueue {
 
     int front = -1;
@@ -65,6 +115,7 @@ class TokenQueue {
 }
 
 /* STACK FOR HISTORY */
+
 class ActionStack {
 
     int top = -1;
@@ -85,8 +136,6 @@ class ActionStack {
             return;
         }
 
-        System.out.println("\n--- Action History ---");
-
         for (int i = top; i >= 0; i--)
             System.out.println(stack[i]);
     }
@@ -96,10 +145,10 @@ public class HealHubDSA {
 
     static Scanner sc = new Scanner(System.in);
 
-    /* LINKED LIST HEAD */
     static Patient head = null;
 
-    /* DOCTOR ARRAY */
+    static PatientHashTable hashTable = new PatientHashTable();
+
     static Doctor doctors[] = new Doctor[50];
     static int doctorCount = 0;
 
@@ -110,6 +159,7 @@ public class HealHubDSA {
     static ActionStack history = new ActionStack();
 
     /* PATIENT REGISTRATION */
+
     static void registerPatient() {
 
         System.out.print("Enter Name: ");
@@ -123,6 +173,8 @@ public class HealHubDSA {
 
         Patient newPatient = new Patient(patientId++, name, phone, email);
 
+        hashTable.insert(newPatient);
+
         if (head == null)
             head = newPatient;
         else {
@@ -135,15 +187,16 @@ public class HealHubDSA {
             temp.next = newPatient;
         }
 
-        System.out.println("Patient Registered Successfully!");
-        history.push("Registered Patient: " + name);
+        System.out.println("Patient Registered!");
+        history.push("Patient Registered: " + name);
     }
 
     /* DISPLAY PATIENTS */
+
     static void displayPatients() {
 
         if (head == null) {
-            System.out.println("No Patients Registered");
+            System.out.println("No Patients");
             return;
         }
 
@@ -162,10 +215,11 @@ public class HealHubDSA {
         }
     }
 
-    /* SEARCH PATIENT */
+    /* SEARCH PATIENT (LINEAR SEARCH) */
+
     static void searchPatient() {
 
-        System.out.print("Enter Patient Name: ");
+        System.out.print("Enter Name to Search: ");
         String name = sc.next();
 
         Patient temp = head;
@@ -187,12 +241,8 @@ public class HealHubDSA {
     }
 
     /* ADD DOCTOR */
-    static void addDoctor() {
 
-        if (doctorCount == 50) {
-            System.out.println("Doctor List Full");
-            return;
-        }
+    static void addDoctor() {
 
         System.out.print("Doctor Name: ");
         String name = sc.next();
@@ -200,7 +250,10 @@ public class HealHubDSA {
         System.out.print("Specialization: ");
         String spec = sc.next();
 
-        doctors[doctorCount] = new Doctor(doctorCount + 1, name, spec);
+        System.out.print("Experience (years): ");
+        int exp = sc.nextInt();
+
+        doctors[doctorCount] = new Doctor(doctorCount + 1, name, spec, exp);
 
         doctorCount++;
 
@@ -209,7 +262,8 @@ public class HealHubDSA {
         System.out.println("Doctor Added!");
     }
 
-    /* SORT DOCTORS (Bubble Sort) */
+    /* BUBBLE SORT DOCTORS */
+
     static void sortDoctors() {
 
         for (int i = 0; i < doctorCount - 1; i++) {
@@ -230,34 +284,29 @@ public class HealHubDSA {
     }
 
     /* DISPLAY DOCTORS */
-    static void displayDoctors() {
 
-        if (doctorCount == 0) {
-            System.out.println("No Doctors Added");
-            return;
-        }
+    static void displayDoctors() {
 
         for (int i = 0; i < doctorCount; i++) {
 
             System.out.println(
                     doctors[i].id + " " +
                     doctors[i].name + " " +
-                    doctors[i].specialization
+                    doctors[i].specialization + " " +
+                    doctors[i].experience + " years"
             );
         }
     }
 
-    /* GENERATE TOKEN */
+    /* TOKEN GENERATION */
+
     static void generateToken() {
 
         int token = tokenNumber++;
 
         tokenQueue.enqueue(token);
 
-        System.out.println("\n--- Collect Your Token ---");
-        System.out.println("Token Number: " + token);
-        System.out.println("Please pay at reception.");
-        System.out.println("Thank You 😊");
+        System.out.println("Your Token Number: " + token);
 
         history.push("Token Generated: " + token);
     }
@@ -278,7 +327,8 @@ public class HealHubDSA {
             System.out.println("6 Display Doctors");
             System.out.println("7 Generate Token");
             System.out.println("8 Show History");
-            System.out.println("9 Exit");
+            System.out.println("9 Show Hash Table");
+            System.out.println("10 Exit");
 
             System.out.print("Enter Choice: ");
             choice = sc.nextInt();
@@ -318,13 +368,17 @@ public class HealHubDSA {
                     break;
 
                 case 9:
-                    System.out.println("Exiting HealHub System...");
+                    hashTable.displayHash();
+                    break;
+
+                case 10:
+                    System.out.println("Exiting System...");
                     break;
 
                 default:
                     System.out.println("Invalid Choice");
             }
 
-        } while (choice != 9);
+        } while (choice != 10);
     }
 }
